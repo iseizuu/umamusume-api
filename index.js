@@ -7,7 +7,7 @@ app.use(express.json());
 app.use('/api', routes);
 app.get('/', (req, res) => {
     console.log('Scraper API is running!');
-    res.send('Scraper API is running!');
+    res.redirect('https://aizuu.my.id');
 });
 app.use((req, res, next) => {
     res.status(404).send({
