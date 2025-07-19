@@ -13,7 +13,7 @@ Uma Musume API Endpoint using Express.js and Cheerio for web scraping the data f
 * GET `/banners`: Get the current banners.
 * GET `/character-tiers`: Get the tier list of characters.
 * GET `/characters`: Get the list of characters.
-* GET `/character/:name`: Get the detailed information of a character.
+* GET `/characters/:name`: Get the detailed information of a character.
 * GET `/support-card`: Get the list of support cards.
 * GET `/support-card/:name`: Get the detailed information of a support card.
 * GET `/support-card-tiers`: Get the tier list of support cards.

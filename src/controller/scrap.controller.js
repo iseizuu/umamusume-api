@@ -49,6 +49,7 @@ class ScraperController {
                 .includes(
                     req.params.name.toLowerCase().split(" ").join("-"))
             );
+            if (!results.length) return res.status(404).json({ success: false, message: "Character not found" });
             if (req.query.limit) {
                 const data = await ScraperService.getSupportCardStats(results[0].url);
                 res.status(200).json({ success: true, dataFound: 1, data: data });
@@ -74,6 +75,7 @@ class ScraperController {
                 .includes(
                     req.params.name.toLowerCase().split(" ").join("-"))
             );
+            if (!results.length) return res.status(404).json({ success: false, message: "Character not found" });
             if (req.query.limit) {
                 const data = await ScraperService.getCharacterStats(results[0].url);
                 res.status(200).json({ success: true, dataFound: 1, data: data });

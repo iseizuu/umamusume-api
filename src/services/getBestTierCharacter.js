@@ -83,7 +83,7 @@ module.exports = class BestTierCharacter {
                             }
                         });
                     }
-                    
+
                     resolve(results);
                 })
                 .catch(error => {

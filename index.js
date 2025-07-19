@@ -1,5 +1,5 @@
 const express = require('express');
-const routes = require('./src/api/routes'); // Impor rute Anda
+const routes = require('./src/api/routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 

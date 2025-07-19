@@ -3,10 +3,6 @@ const cheerio = require('cheerio');
 
 module.exports = class Characters {
 
-    /**
-     * Fetches the list of characters from the Game8 wiki page.
-     * @return {Promise<Array<Object>>} The list of characters from the API.
-     */
     static getCharacter() {
         return new Promise((resolve, reject) => {
             axios.get('https://game8.co/games/Umamusume-Pretty-Derby/archives/535926')

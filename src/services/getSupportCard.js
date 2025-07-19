@@ -1,6 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { camelCase } = require('cheerio/utils');
 
 module.exports = class SupportCard {
 
@@ -68,7 +67,7 @@ module.exports = class SupportCard {
                         };
                         results.rCards.push(card);
                     });
-                    
+
                     resolve(results);
                 })
                 .catch(error => {

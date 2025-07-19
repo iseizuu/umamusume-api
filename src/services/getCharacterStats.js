@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 module.exports = class CharacterStats {
- 
+
     static getCharacterStats(url) {
         return new Promise(async (resolve, reject) => {
             try {
