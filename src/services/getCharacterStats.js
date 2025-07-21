@@ -8,6 +8,11 @@ module.exports = class CharacterStats {
             try {
                 const { data } = await axios.get(url);
                 const $ = cheerio.load(data);
+                const finalResult = {
+                    characterInfo: {},
+                    buildGuide: {}
+                };
+
                 const infoTable = $('h2:contains("Character Info")').nextAll('table').first();
                 const characterInfo = {
                     name: infoTable.find('tr').first().text().trim(),
@@ -16,7 +21,6 @@ module.exports = class CharacterStats {
                     statGrowth: {},
                     uniqueSkill: {}
                 };
-
                 const getAptitude = (headerText) => {
                     const values = {};
                     infoTable.find(`th:contains("${headerText}")`).first().parent().next('tr').find('td').each((i, td) => {
@@ -28,24 +32,23 @@ module.exports = class CharacterStats {
                     });
                     return values;
                 };
-
                 characterInfo.aptitudes.track = getAptitude('Track Aptitude');
                 characterInfo.aptitudes.distance = getAptitude('Distance Aptitude');
                 characterInfo.aptitudes.pace = getAptitude('Pace Aptitude');
                 characterInfo.statGrowth = getAptitude('Stat Growth');
-
                 const skillTable = $('h3:contains("Unique Skill")').next('table');
                 characterInfo.uniqueSkill = {
                     name: skillTable.find('th').text().trim(),
                     description: skillTable.find('td').text().trim()
                 };
+                finalResult.characterInfo = characterInfo;
 
                 const buildGuide = {
                     recommendedStats: {},
-                    recommendedSupportCards: [],
+                    recommendedSupportCards: { description: "", list: [] },
+                    alternateSRCards: [],
                     recommendedSkills: []
                 };
-
                 const recommendedStatsTable = $('h3:contains("Recommended Stats")').nextAll('table').first();
                 recommendedStatsTable.find('tbody tr:last-child td').each((i, cell) => {
                     const statName = recommendedStatsTable.find('th img').eq(i).attr('alt');
@@ -53,16 +56,30 @@ module.exports = class CharacterStats {
                         buildGuide.recommendedStats[statName.toLowerCase()] = parseInt($(cell).text().trim(), 10);
                     }
                 });
-
                 const supportCardsTable = $('h3:contains("Recommended Support Cards")').nextAll('table').first();
                 supportCardsTable.find('td.center a').each((i, card) => {
-                    buildGuide.recommendedSupportCards.push({
+                    buildGuide.recommendedSupportCards.list.push({
                         name: $(card).text().trim(),
                         url: $(card).attr('href'),
                         image: $(card).find('img').attr('data-src')
                     });
                 });
+                buildGuide.recommendedSupportCards.description = $('h3:contains("Recommended Support Cards")').next('table').next('p.a-paragraph').text().trim();
+                const alternateSRTable = $('h4:contains("Alternate SR Support Cards")').next('table');
+                alternateSRTable.find('td[width="33%"]').each((i, cell) => {
+                    const link = $(cell).find('a').first();
+                    const tooltipSpan = link.find('span.js-discription-tooltip');
+                    const templateHtml = tooltipSpan.find('template').html();
+                    const nameMatch = templateHtml ? templateHtml.match(/(.*?)<br>/) : null;
+                    const typeMatch = templateHtml ? templateHtml.match(/Type<\/b>:\s*(\w+)/) : null;
 
+                    buildGuide.alternateSRCards.push({
+                        name: nameMatch ? nameMatch[1].trim() : "Unknown Name",
+                        type: typeMatch ? typeMatch[1] : null,
+                        url: link.attr('href'),
+                        image: link.find('img').attr('data-src'),
+                    });
+                });
                 const skillsTable = $('h3:contains("Recommended Skills")').nextAll('table').first();
                 skillsTable.find('td.center a').each((i, skill) => {
                     buildGuide.recommendedSkills.push({
@@ -71,11 +88,7 @@ module.exports = class CharacterStats {
                         image: $(skill).find('img').attr('data-src')
                     });
                 });
-
-                const finalResult = {
-                    characterInfo,
-                    buildGuide
-                };
+                finalResult.buildGuide = buildGuide;
 
                 resolve(finalResult);
             } catch (error) {
@@ -85,5 +98,3 @@ module.exports = class CharacterStats {
         });
     }
 }
-
-
