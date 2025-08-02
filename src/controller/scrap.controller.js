@@ -8,7 +8,7 @@ class ScraperController {
             const data = await ScraperService.getCharacter();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -17,7 +17,7 @@ class ScraperController {
             const data = await ScraperService.getBanner();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -26,7 +26,7 @@ class ScraperController {
             const data = await ScraperService.getBestTierCharacter();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -35,7 +35,7 @@ class ScraperController {
             const data = await ScraperService.getBestTierSupportCard();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -51,7 +51,7 @@ class ScraperController {
                 .includes(
                     req.params.name.toLowerCase().split(" ").join("-"))
             );
-            if (!results.length) return res.status(404).json({ success: false, message: "Character not found" });
+            if (!results.length) return errorHandler("Support Card not found", res);
             if (req.query.limit) {
                 const data = await ScraperService.getSupportCardStats(results[0].url);
                 res.status(200).json({ success: true, dataFound: 1, data: data });
@@ -60,7 +60,7 @@ class ScraperController {
                 res.status(200).json({ success: true, dataFound: data.length, data: data });
             }
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -78,7 +78,7 @@ class ScraperController {
                 .includes(
                     req.params.name.toLowerCase().split(" ").join("-"))
             );
-            if (!results.length) return res.status(404).json({ success: false, message: "Character not found" });
+            if (!results.length) return errorHandler("Character not found", res);
             if (req.query.limit) {
                 const data = await ScraperService.getCharacterStats(results[0].url);
                 res.status(200).json({ success: true, dataFound: 1, data: data });
@@ -87,7 +87,7 @@ class ScraperController {
                 res.status(200).json({ success: true, dataFound: data.length, data: data });
             }
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -96,7 +96,7 @@ class ScraperController {
             const data = await ScraperService.getSupportCard();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -105,7 +105,7 @@ class ScraperController {
             const data = await ScraperService.getSkills();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 
@@ -122,20 +122,19 @@ class ScraperController {
                     .includes(req.params.name.toLowerCase().split(" ").join("-"));
                 return name && skill.url;
             });
-
-            if (!results.length) return errorHandler("Skill not found", res);
+            console.log(results);
             if (!results.length) return errorHandler("Skill not found", res);
 
             const data = await Promise.all(results.map(skill => ScraperService.getSkillStats(skill.url)));
             res.status(200).json({ success: true, dataFound: data.length, data });
         } catch (error) {
-            errorHandler(error, res);
+            errorHandler(error.message, res);
         }
     }
 }
 
 function errorHandler(error, res) {
-    const umaError = new UmaError(error.message);
+    const umaError = new UmaError(error);
     const message = `UmaApiError: ${umaError.message}`;
     res.status(500).json({ success: false, message: message });
 }
