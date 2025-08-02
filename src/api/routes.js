@@ -9,5 +9,7 @@ router.get('/characters/:name', ScraperController.fetchCharacterStats);
 router.get('/support-card', ScraperController.fetchSupportCard);
 router.get('/support-card/:name', ScraperController.fetchSupportCardStats);
 router.get('/support-card-tiers', ScraperController.fetchSupportCardTierList);
+router.get('/skills', ScraperController.fetchSkills);
+router.get('/skills/:name', ScraperController.fetchSkillStats);
 
 module.exports = router;

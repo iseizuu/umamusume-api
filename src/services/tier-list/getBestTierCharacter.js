@@ -1,11 +1,11 @@
-const axios = require('axios');
+const { request } = require('../../structure/request');
 const cheerio = require('cheerio');
 
 module.exports = class BestTierCharacter {
 
     static getBestTierCharacter() {
         return new Promise((resolve, reject) => {
-            axios.get('https://game8.co/games/Umamusume-Pretty-Derby/archives/536352')
+            request('https://game8.co/games/Umamusume-Pretty-Derby/archives/536352')
                 .then(response => {
                     const $ = cheerio.load(response.data);
                     const results = {
@@ -86,9 +86,7 @@ module.exports = class BestTierCharacter {
 
                     resolve(results);
                 })
-                .catch(error => {
-                    reject(error);
-                });
+                .catch(error => reject(error));
         });
     };
 }

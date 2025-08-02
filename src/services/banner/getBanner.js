@@ -1,11 +1,11 @@
-const axios = require('axios');
+const { request } = require('../../structure/request');
 const cheerio = require('cheerio');
 
 module.exports = class Banner {
 
     static getBanner() {
         return new Promise((resolve, reject) => {
-            axios.get('https://game8.co/games/Umamusume-Pretty-Derby/archives/536311')
+            request('https://game8.co/games/Umamusume-Pretty-Derby/archives/536311')
                 .then(response => {
                     const $ = cheerio.load(response.data);
                     const results = {
@@ -31,7 +31,7 @@ module.exports = class Banner {
                         const banners = [];
                         tableElement.find('tbody > tr:has(td)').each((i, row) => {
                             const cells = $(row).find('td');
-                            if (cells.length < 2) return; 
+                            if (cells.length < 2) return;
 
                             const link = cells.eq(0).find('a');
                             const image = cells.eq(0).find('img');

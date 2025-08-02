@@ -1,4 +1,5 @@
 const ScraperService = require('../services/index');
+const UmaError = require('../structure/error');
 
 class ScraperController {
 
@@ -7,15 +8,16 @@ class ScraperController {
             const data = await ScraperService.getCharacter();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            errorHandler(error, res);
         }
     }
+
     static async fetchBanner(req, res) {
         try {
             const data = await ScraperService.getBanner();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            errorHandler(error, res);
         }
     }
 
@@ -24,7 +26,7 @@ class ScraperController {
             const data = await ScraperService.getBestTierCharacter();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            errorHandler(error, res);
         }
     }
 
@@ -33,7 +35,7 @@ class ScraperController {
             const data = await ScraperService.getBestTierSupportCard();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            errorHandler(error, res);
         }
     }
 
@@ -58,9 +60,10 @@ class ScraperController {
                 res.status(200).json({ success: true, dataFound: data.length, data: data });
             }
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            errorHandler(error, res);
         }
     }
+
     static async fetchCharacterStats(req, res) {
         try {
             const response = await ScraperService.getCharacter();
@@ -84,7 +87,7 @@ class ScraperController {
                 res.status(200).json({ success: true, dataFound: data.length, data: data });
             }
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            errorHandler(error, res);
         }
     }
 
@@ -93,9 +96,48 @@ class ScraperController {
             const data = await ScraperService.getSupportCard();
             res.status(200).json({ success: true, data: data });
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            errorHandler(error, res);
         }
     }
+
+    static async fetchSkills(req, res) {
+        try {
+            const data = await ScraperService.getSkills();
+            res.status(200).json({ success: true, data: data });
+        } catch (error) {
+            errorHandler(error, res);
+        }
+    }
+
+    static async fetchSkillStats(req, res) {
+        try {
+            const response = await ScraperService.getSkills();
+            const merge = [
+                ...response.normal,
+                ...response.rare,
+                ...response.unique
+            ];
+            const results = merge.filter(skill => {
+                const name = skill.name.toLowerCase().split(" ").join("-")
+                    .includes(req.params.name.toLowerCase().split(" ").join("-"));
+                return name && skill.url;
+            });
+
+            if (!results.length) return errorHandler("Skill not found", res);
+            if (!results.length) return errorHandler("Skill not found", res);
+
+            const data = await Promise.all(results.map(skill => ScraperService.getSkillStats(skill.url)));
+            res.status(200).json({ success: true, dataFound: data.length, data });
+        } catch (error) {
+            errorHandler(error, res);
+        }
+    }
+}
+
+function errorHandler(error, res) {
+    const umaError = new UmaError(error.message);
+    const message = `UmaApiError: ${umaError.message}`;
+    res.status(500).json({ success: false, message: message });
 }
 
 module.exports = ScraperController;
