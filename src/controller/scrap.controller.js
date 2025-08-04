@@ -87,6 +87,7 @@ class ScraperController {
                 res.status(200).json({ success: true, dataFound: data.length, data: data });
             }
         } catch (error) {
+            console.log(error);
             errorHandler(error.message, res);
         }
     }

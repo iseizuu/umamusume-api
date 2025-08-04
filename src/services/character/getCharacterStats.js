@@ -12,11 +12,10 @@ module.exports = class CharacterStats {
                         characterInfo: {},
                         buildGuide: {}
                     };
-
                     const infoTable = $('h2:contains("Character Info")').nextAll('table').first();
                     const characterInfo = {
                         name: infoTable.find('tr').first().text().trim(),
-                        rank: infoTable.find('div.align img').attr('alt').replace(' Rank', ''),
+                        rank: !infoTable.find('div.align img').attr('alt') ? "?" : infoTable.find('div.align img').attr('alt').replace(' Rank', ''),
                         image: infoTable.find('img').first().attr('data-src'),
                         url: url,
                         aptitudes: {},
