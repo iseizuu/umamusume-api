@@ -17,6 +17,8 @@ Uma Musume API Endpoint using Express.js and Cheerio for web scraping the data f
 * GET `/support-card`: Get the list of support cards.
 * GET `/support-card/:name`: Get the detailed information of a support card.
 * GET `/support-card-tiers`: Get the tier list of support cards.
+* GET `/skills`: Get the list of all skill.
+* GET `/skills/:name`: Get the detailed information of the skill.
 
 ## Usage
 
