@@ -12,12 +12,22 @@ module.exports = class CharacterStats {
                         characterInfo: {},
                         buildGuide: {}
                     };
+                    const rank = {};
+                    const rankKeys = ['overall', 'ease', 'cm', 'timetrials'];
                     const infoTable = $('h2:contains("Character Info")').nextAll('table').first();
+                    infoTable.find('td a.a-link').each((i, td) => {
+                        rank[rankKeys[i]] = {
+                            rank: $(td).find('img').attr('alt').replace('Rank', '').trim() || null,
+                            url: 'https://game8.co' + $(td).attr('href') || null,
+                            image: $(td).find('img').attr('data-src') || null
+                        };
+                    });
                     const characterInfo = {
                         name: infoTable.find('tr').first().text().trim(),
-                        rank: !infoTable.find('div.align img').attr('alt') ? "?" : infoTable.find('div.align img').attr('alt').replace(' Rank', ''),
                         image: infoTable.find('img').first().attr('data-src'),
                         url: url,
+                        basicInfo: {},
+                        rank: rank,
                         aptitudes: {},
                         statGrowth: {},
                         uniqueSkill: {}
@@ -37,19 +47,36 @@ module.exports = class CharacterStats {
                     characterInfo.aptitudes.distance = getAptitude('Distance Aptitude');
                     characterInfo.aptitudes.pace = getAptitude('Pace Aptitude');
                     characterInfo.statGrowth = getAptitude('Stat Growth');
+
+                    const basicStats = $('h3:contains("Basic Information")').next('table');
+                    const mainCell = basicStats.find('td[rowspan="4"]');
+                    const dynamicDetails = {};
+                    characterInfo.basicInfo.name = mainCell.find('b').text().trim() || null;
+                    characterInfo.basicInfo.image = mainCell.find('img').attr('data-src') || null;
+                    characterInfo.basicInfo.quote = mainCell.contents().last().text().trim() || null;
+                    basicStats.find('tbody > tr:has(th)').each((i, row) => {
+                        const header = $(row).find('th').text().trim();
+                        const rawText = $(row).find('td').text().trim();
+                        const value = rawText.split('\n').pop().trim() || null;
+                        const key = header.toLowerCase().replace(/\s+/g, '');
+                        dynamicDetails[key] = value;
+                    });
+                    characterInfo.basicInfo.details = dynamicDetails
+                    characterInfo.basicInfo.description = $('td[colspan="3"]').text().trim() || null;
+
                     const skillTable = $('h3:contains("Unique Skill")').next('table');
                     characterInfo.uniqueSkill = {
                         name: skillTable.find('th').text().trim(),
                         description: skillTable.find('td').text().trim()
                     };
                     finalResult.characterInfo = characterInfo;
-
                     const buildGuide = {
                         recommendedStats: {},
                         recommendedSupportCards: { description: "", list: [] },
                         alternateSRCards: [],
                         recommendedSkills: []
                     };
+
                     const recommendedStatsTable = $('h3:contains("Recommended Stats")').nextAll('table').first();
                     recommendedStatsTable.find('tbody tr:last-child td').each((i, cell) => {
                         const statName = recommendedStatsTable.find('th img').eq(i).attr('alt');
@@ -57,6 +84,7 @@ module.exports = class CharacterStats {
                             buildGuide.recommendedStats[statName.toLowerCase()] = parseInt($(cell).text().trim(), 10);
                         }
                     });
+
                     const supportCardsTable = $('h3:contains("Recommended Support Cards")').nextAll('table').first();
                     supportCardsTable.find('td.center a').each((i, card) => {
                         buildGuide.recommendedSupportCards.list.push({
@@ -66,6 +94,7 @@ module.exports = class CharacterStats {
                         });
                     });
                     buildGuide.recommendedSupportCards.description = $('h3:contains("Recommended Support Cards")').next('table').next('p.a-paragraph').text().trim();
+
                     const alternateSRTable = $('h4:contains("Alternate SR Support Cards")').next('table');
                     alternateSRTable.find('td[width="33%"]').each((i, cell) => {
                         const link = $(cell).find('a').first();
@@ -81,6 +110,7 @@ module.exports = class CharacterStats {
                             image: link.find('img').attr('data-src'),
                         });
                     });
+
                     const skillsTable = $('h3:contains("Recommended Skills")').nextAll('table').first();
                     skillsTable.find('td.center a').each((i, skill) => {
                         buildGuide.recommendedSkills.push({

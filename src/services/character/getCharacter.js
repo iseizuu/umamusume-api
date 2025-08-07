@@ -52,6 +52,7 @@ module.exports = class Characters {
                             };
                             characters.push(characterData);
                         });
+
                         return characters;
                     };
 
@@ -66,6 +67,7 @@ module.exports = class Characters {
                             };
                             characters.push(character);
                         });
+                        
                         return characters;
                     };
 

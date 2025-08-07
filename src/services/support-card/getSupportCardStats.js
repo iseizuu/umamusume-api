@@ -20,7 +20,6 @@ module.exports = class SupportCardStats {
 
                     const infoTable = $('h3:contains("Unique Perk and Overview")').next('table');
                     const nameAndImageCell = infoTable.find('td[colspan="12"]');
-
                     cardDetails.cardInfo = {
                         name: nameAndImageCell.find('b').text().trim(),
                         character: nameAndImageCell.text().trim().split('\n').pop().trim(),
@@ -31,11 +30,28 @@ module.exports = class SupportCardStats {
                         uniquePerk: infoTable.find('th:contains("Unique Perk")').next().text().trim()
                     };
 
-                    const effectsTable = $('h3:contains("Support Effects")').next('table');
-                    effectsTable.find('td.center').contents().each((i, node) => {
-                        if (node.type === 'text' && $(node).text().trim()) {
-                            cardDetails.supportEffects.push($(node).text().trim());
+                    const headers = [];
+                    const effectsTable = $('h3:contains("Support Effects")').next('div.scroll--table').find('table');
+                    effectsTable.find('thead th').each((i, el) => {
+                        if (i > 0) {
+                            headers.push($(el).text().trim());
                         }
+                    });
+
+                    effectsTable.find('tbody > tr').each((i, row) => {
+                        const cells = $(row).find('td');
+                        if (cells.length < 2) return;
+                        const effectName = cells.eq(0).text().trim();
+                        const effectLevels = {
+                            name: effectName
+                        };
+                        cells.slice(1).each((j, cell) => {
+                            const levelHeader = headers[j].toLowerCase();
+                            const value = $(cell).text().trim();
+                            effectLevels[levelHeader] = value;
+                        });
+
+                        cardDetails.supportEffects.push(effectLevels);
                     });
 
                     const scrapeSkillsTable = (table) => {

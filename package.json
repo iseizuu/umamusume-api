@@ -1,6 +1,6 @@
 {
-  "name": "apistore",
-  "version": "1.0.0",
+  "name": "umamusume-api",
+  "version": "1.2.0",
   "description": "Uma Musume API Endpoint based on scraper",
   "main": "index.js",
   "scripts": {
