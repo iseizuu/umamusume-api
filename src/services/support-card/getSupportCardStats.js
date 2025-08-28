@@ -19,11 +19,12 @@ module.exports = class SupportCardStats {
                     };
 
                     const infoTable = $('h3:contains("Unique Perk and Overview")').next('table');
-                    const nameAndImageCell = infoTable.find('td[colspan="12"]');
+                    const nameAndImageCell = infoTable.find('td[colspan="6"]');
                     cardDetails.cardInfo = {
                         name: nameAndImageCell.find('b').text().trim(),
-                        character: nameAndImageCell.text().trim().split('\n').pop().trim(),
+                        character: infoTable.find('td[rowspan="4"]').text().trim().split('\n')[0] ?? null,
                         image: nameAndImageCell.find('img').attr('data-src'),
+                        tier: infoTable.find('th:contains("Tier")').next().find('img').attr('alt') || "Unranked",
                         url: url,
                         rarity: infoTable.find('th:contains("Rarity")').next().text().trim(),
                         specialty: infoTable.find('th:contains("Specialty")').next().text().trim(),

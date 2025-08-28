@@ -1,5 +1,6 @@
 const ScraperService = require('../services/index');
 const UmaError = require('../structure/error');
+const Fuse = require('fuse.js');
 
 class ScraperController {
 
@@ -47,16 +48,13 @@ class ScraperController {
                 ...response.srCards,
                 ...response.rCards,
             ];
-            const results = mergeAllCharacters.filter(character => character.name.toLowerCase().split(" ").join("-")
-                .includes(
-                    req.params.name.toLowerCase().split(" ").join("-"))
-            );
+            const results = search(req.params.name, mergeAllCharacters);
             if (!results.length) return errorHandler("Support Card not found", res);
             if (req.query.limit) {
-                const data = await ScraperService.getSupportCardStats(results[0].url);
+                const data = await ScraperService.getSupportCardStats(results[0].item.url);
                 res.status(200).json({ success: true, dataFound: 1, data: data });
             } else {
-                const data = await Promise.all(results.map(character => ScraperService.getSupportCardStats(character.url)));
+                const data = await Promise.all(results.map(character => ScraperService.getSupportCardStats(character.item.url)));
                 res.status(200).json({ success: true, dataFound: data.length, data: data });
             }
         } catch (error) {
@@ -74,16 +72,14 @@ class ScraperController {
                 ...response.allCharacters.twoStar,
                 ...response.allCharacters.oneStar
             ];
-            const results = mergeAllCharacters.filter(character => character.name.toLowerCase().split(" ").join("-")
-                .includes(
-                    req.params.name.toLowerCase().split(" ").join("-"))
-            );
+
+            const results = search(req.params.name, mergeAllCharacters);
             if (!results.length) return errorHandler("Character not found", res);
             if (req.query.limit) {
-                const data = await ScraperService.getCharacterStats(results[0].url);
+                const data = await ScraperService.getCharacterStats(results[0].item.url);
                 res.status(200).json({ success: true, dataFound: 1, data: data });
             } else {
-                const data = await Promise.all(results.map(character => ScraperService.getCharacterStats(character.url)));
+                const data = await Promise.all(results.map(character => ScraperService.getCharacterStats(character.item.url)));
                 res.status(200).json({ success: true, dataFound: data.length, data: data });
             }
         } catch (error) {
@@ -118,20 +114,25 @@ class ScraperController {
                 ...response.rare,
                 ...response.unique
             ];
-            const results = merge.filter(skill => {
-                const name = skill.name.toLowerCase().split(" ").join("-")
-                    .includes(req.params.name.toLowerCase().split(" ").join("-"));
-                return name && skill.url;
-            });
-            console.log(results);
+            const results = search(req.params.name, merge);
             if (!results.length) return errorHandler("Skill not found", res);
 
-            const data = await Promise.all(results.map(skill => ScraperService.getSkillStats(skill.url)));
+            const data = await Promise.all(results.map(skill => ScraperService.getSkillStats(skill.item.url)));
             res.status(200).json({ success: true, dataFound: data.length, data });
         } catch (error) {
             errorHandler(error.message, res);
         }
     }
+}
+
+function search(params, list) {
+    const fuse = new Fuse(list, { 
+        keys: ['name'],
+        isCaseSensitive: true,
+        shouldSort: true,
+        threshold: 0.4
+    });
+    return fuse.search(params);
 }
 
 function errorHandler(error, res) {

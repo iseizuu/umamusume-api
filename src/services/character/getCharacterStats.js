@@ -49,7 +49,7 @@ module.exports = class CharacterStats {
                     characterInfo.statGrowth = getAptitude('Stat Growth');
 
                     const basicStats = $('h3:contains("Basic Information")').next('table');
-                    const mainCell = basicStats.find('td[rowspan="4"]');
+                    const mainCell = basicStats.find('td[rowspan="5"]');
                     const dynamicDetails = {};
                     characterInfo.basicInfo.name = mainCell.find('b').text().trim() || null;
                     characterInfo.basicInfo.image = mainCell.find('img').attr('data-src') || null;
@@ -62,7 +62,7 @@ module.exports = class CharacterStats {
                         dynamicDetails[key] = value;
                     });
                     characterInfo.basicInfo.details = dynamicDetails
-                    characterInfo.basicInfo.description = $('td[colspan="3"]').text().trim() || null;
+                    characterInfo.basicInfo.description = basicStats.find('td[colspan="3"]').text().trim() || null;
 
                     const skillTable = $('h3:contains("Unique Skill")').next('table');
                     characterInfo.uniqueSkill = {
