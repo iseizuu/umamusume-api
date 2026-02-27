@@ -10,7 +10,7 @@ A simple API endpoint for Uma Musume data, scraped from Game8 wiki page.
 
 ## API Endpoints
 
-Base URL: https://uma-api.aizuu.my.id/api
+Base URL: [https://uma-api.aizuu.my.id/api](https://umaapi.vercel.app/api)
 
 * GET `/banners`
 * GET `/character-tiers`
